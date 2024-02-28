@@ -1,56 +1,81 @@
-// "characters": "https://rickandmortyapi.com/api/character",
-// "locations": "https://rickandmortyapi.com/api/location",
-// "episodes": "https://rickandmortyapi.com/api/episode"
+// characters: https://rickandmortyapi.com/api/character,
+// locations:  https://rickandmortyapi.com/api/location,
+// episodes:   https://rickandmortyapi.com/api/episode
 
-const page = 12
-const baseUrl = 'https://rickandmortyapi.com/api'
+const page = 2
+const baseURL = `https://rickandmortyapi.com/api/`
 
-const loadCharacter = async ()=>{
-    const res = await fetch(`${baseUrl}/character?page=${page}`)
+const loadCharacter = async () => {
+    const res = await fetch(`${baseURL}character?page=${page}`) 
     return await res.json()
 }
 
-const loadLocation = async ()=>{
-    const res = await fetch(`${baseUrl}/location`)
+const loadLocation = async () => {
+    const res = await fetch(`${baseURL}location`)
     return await res.json()
 }
 
-const loadEpisode = async ()=>{
-    const res = await fetch(`${baseUrl}/episode`)
+const loadEpisode = async () => {
+    const res = await fetch (`${baseURL}episode`)
     return await res.json()
 }
 
-const loadAllWithPromiseAll = async () => {
+const loadAllWithPromisseAll = async () => {
     const [character, location, episode] = await Promise.all([
-        loadCharacter(), 
+        loadCharacter(),
         loadLocation(),
         loadEpisode()
     ])
-    showCharacter(character.results)
-    console.log("Location: ",location)
-    console.log("Episode:",episode)
+
+    showCharacter( character.results)
 }
 
-loadAllWithPromiseAll()
+loadAllWithPromisseAll()
 
 function showCharacter(characters){
-    const characterContainer = document.getElementById('character-container')
+    const characterContainer = document.getElementById("character-container")
+
     characters.map((character) => {
-        const divCharacter = document.createElement('div')
-        divCharacter.innerHTML= `
-            <img src= "${character.image}" alt="${character.name}"/>
+        const divCharacterElement = document.createElement('div')
+        divCharacterElement.id = character.id
+
+        divCharacterElement.innerHTML = `
+            <img src="${character.image}" alt="Imagem do personagem">
             <article>
-            <h3>${character.name}</h3>
-            <span>${character.status} - ${character.species}</span>
-
-            <span class="location">Location:</span>
-            <a class="location-color" href= "${character.location.url}">${character.location.name}</a>
-
-            <span>Origin:</span>
-            <a class="origin-color" href="${character.origin.url}"> ${character.origin.name}</a>
+                <ul>
+                    <li>
+                        <h3>${character.name}</h3>
+                        <span>${character.status} - ${character.location.name}</span>
+                    </li>
+                    <li>
+                        <span class="location">Location: </span>
+                        <a href="${character.location.url}"> ${character.location.name}</a>
+                    </li>
+                    <li>
+                        <span>Origin: </span>
+                        <a href="${character.origin.url}"> ${character.origin.name}</span>
+                    </li>
+                </ul>
             </article>
-        `
-        divCharacter.classList.add('character-box')
-        characterContainer.appendChild(divCharacter)
+            
+            `;
+
+        divCharacterElement.classList.add('character-box')
+        characterContainer.appendChild(divCharacterElement)
+
+        divCharacterElement.addEventListener('click', async () => {
+            characterDetails(character.id)
+        })
     })
+
+}
+
+function characterDetails(id){
+    console.log(id)
+    console.log(encryptId(id))
+    window.location.href = `./pages/character.html?id=${id}`
+}
+
+function encryptId(id) {
+    return id.toString(36)
 }
